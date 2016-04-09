@@ -58,7 +58,9 @@ def get_answer_string(ticker_string, param_string):
         response string, CSV formatted.
     """
     url = 'http://finance.yahoo.com/d/quotes.csv?s=' + ticker_string + '&f=' + param_string
-    answer_string = requests.get(url).text
+    response = requests.get(url)
+    answer_string = response.text
+
     return answer_string
 
 
@@ -102,7 +104,7 @@ def construct_row(k, header_list, answer_list):
     Returns:
         row of data in form of a dictionary.
     """
-    return {row[header_list[i]]: answer_list[k][i] for i in xrange(len(header_list))}
+    return {header_list[i]: answer_list[k][i] for i in xrange(len(header_list))}
 
 
 def save_formatted_csv(result_csv_path, header_list, ticker_list, answer_list):
