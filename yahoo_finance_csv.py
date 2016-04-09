@@ -1,10 +1,12 @@
-import requests
 import csv
-
+import requests
+from datetime import datetime
+import pandas as pd
 
 def get_api_dict_from_file(api_dict_csv_path):
     """Creates a dictionary of Yahoo Finance API parameters from a csv file.
-    
+
+
     Arguments:
         string containing path to API dictionary file.
     File specs:
@@ -58,10 +60,15 @@ def get_answer_string(ticker_string, param_string):
         response string, CSV formatted.
     """
     url = 'http://finance.yahoo.com/d/quotes.csv?s=' + ticker_string + '&f=' + param_string
-    response = requests.get(url)
-    answer_string = response.text
-
-    return answer_string
+    while True:
+        try:
+            response = requests.get(url)
+        except requests.exceptions.ConnectionError:
+#           change to logging
+            print 'Connection error'
+        else:
+            answer_string = response.text
+            return answer_string
 
 
 def get_header_list(param_list, api_dict):
@@ -106,22 +113,24 @@ def construct_row(k, header_list, answer_list):
     """
     return {header_list[i]: answer_list[k][i] for i in xrange(len(header_list))}
 
-
 def save_formatted_csv(result_csv_path, header_list, ticker_list, answer_list):
     """Writes the data from the response list to a CSV file using csv.DictWriter.
     
     Arguments:    path to target file, header list, list of tickers, response list.
     Returns:    nothing.
     """
+    start = datetime.now()
     with open(result_csv_path, 'wb') as data:
         fieldnames = ['ticker'] + header_list
-        writer = csv.DictWriter(data, fieldnames, quoting=csv.QUOTE_NONE, escapechar=' ')
+        writer = csv.DictWriter(data, fieldnames, quoting=csv.QUOTE_NONE, escapechar='\b')
         writer.writeheader()
         for k in range(len(ticker_list)):
             row = construct_row(k, header_list, answer_list)
             row['ticker'] = ticker_list[k]
             writer.writerow(row)
-
+    finish = datetime.now()
+    diff = finish - start
+    print diff.total_seconds()
 
 def get_data(tickers_csv_path, result_csv_path):
     """Wrapper function, performs data retrieval/storage using other functions.
@@ -147,3 +156,4 @@ def get_data(tickers_csv_path, result_csv_path):
     # create the csv file with resulting data
     header_list = get_header_list(param_list, api_dict)
     save_formatted_csv(result_csv_path, header_list, ticker_list, answer_list)
+
