@@ -7,8 +7,10 @@ def get_api_dict_from_file(api_dict_csv_path):
     
     Arguments:
         string containing path to API dictionary file.
-        File specs: csv with columns 'parameter, description'.
-    Returns:     a dictionary consisting of parameters and their descriptions.
+    File specs:
+        csv with columns 'parameter, description'.
+    Returns:
+        a dictionary consisting of parameters and their descriptions.
     """
     with open(api_dict_csv_path) as api:
         reader = csv.DictReader(api)
@@ -18,9 +20,12 @@ def get_api_dict_from_file(api_dict_csv_path):
 def get_ticker_list_from_file(tickers_csv_path):
     """Creates a list of tickers from a csv file listing tickers one per line.
     
-    Arguments:    string containing path to tickers csv file.
-        File specs: csv with column 'ticker'.
-    Returns:     a list of ticker strings.
+    Arguments:
+        string containing path to tickers csv file.
+    File specs:
+        csv with column 'ticker'.
+    Returns:
+        a list of ticker strings.
     """
     with open(tickers_csv_path) as tickers:
         reader = csv.DictReader(tickers)
@@ -29,6 +34,7 @@ def get_ticker_list_from_file(tickers_csv_path):
 
 def get_ticker_string_from_list(ticker_list):
     """Returns a string of tickers separated by commas joined from a list."""
+
     ticker_string = ','.join(ticker_list)
     return ticker_string
 
@@ -46,23 +52,23 @@ def get_param_string_from_list(param_list):
 def get_answer_string(ticker_string, param_string):
     """Queries Yahoo Finance API, returns a CSV string with the response.
     
-    Arguments:     comma-separated string of tickers, string of parameters.
-    Returns:     response string, CSV formatted.
+    Arguments:
+        comma-separated string of tickers, string of parameters.
+    Returns:
+        response string, CSV formatted.
     """
     url = 'http://finance.yahoo.com/d/quotes.csv?s=' + ticker_string + '&f=' + param_string
     answer_string = requests.get(url).text
     return answer_string
 
 
-def get_header_list(param_list, api_dict, header_list=[]):
+def get_header_list(param_list, api_dict):
     """Creates a header for a CSV data file.
     
     Arguments:     list of parameters, Yahoo API dictionary.
     Returns:     list of parameter descriptions retrieved from the API dictionary.
     """
-    for param in param_list:
-        header_list.append(api_dict[param])
-    return header_list
+    return [api_dict[param] for param in param_list]
 
 
 def get_answer_list_from_string(answer_string):
@@ -88,16 +94,15 @@ def save_raw_answer_to_file(answer_path, answer_string):
     print 'Raw response csv file saved to ' + answer_path
 
 
-def construct_row(k, header_list, answer_list, row={}):
+def construct_row(k, header_list, answer_list):
     """Creates a row of data for a CSV file (to be used with csv.DictWriter).
     
-    Arguments:    position of observation sublist on the response list, header list, 
-            list formed from the response.
-    Returns:    row of data in form of a dictionary.
+    Arguments:
+        position of observation sublist on the response list, header list, list formed from the response.
+    Returns:
+        row of data in form of a dictionary.
     """
-    for i in range(len(header_list)):
-        row[header_list[i]] = answer_list[k][i]
-    return row
+    return {row[header_list[i]]: answer_list[k][i] for i in xrange(len(header_list))}
 
 
 def save_formatted_csv(result_csv_path, header_list, ticker_list, answer_list):
