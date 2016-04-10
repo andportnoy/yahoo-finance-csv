@@ -167,7 +167,7 @@ def current(ticker_csv_path, write_to_csv=False, result_csv_path=None, api_dict_
     param_list = get_param_list_from_api_dict(api_dict)
     param_string = get_param_string_from_list(param_list)
 
-    # create ticker string for the request)
+    # create ticker string for the request
     ticker_list = sorted(get_ticker_list_from_file(ticker_csv_path))
     ticker_string = get_ticker_string_from_list(ticker_list)
 
