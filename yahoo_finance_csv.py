@@ -3,6 +3,16 @@ import requests
 from datetime import datetime
 import pandas as pd
 
+def timeit(func):
+    def timed(*args, **kwargs):
+        start = datetime.now()
+        result = func(*args, **kwargs)
+        finish = datetime.now()
+        diff = finish - start
+        print func.__name__, 'call took', diff.total_seconds(), 'seconds.'
+        return result
+    return timed
+
 def get_api_dict_from_file(api_dict_csv_path):
     """Creates a dictionary of Yahoo Finance API parameters from a csv file.
 
@@ -18,7 +28,6 @@ def get_api_dict_from_file(api_dict_csv_path):
         reader = csv.DictReader(api)
         return {row['parameter']: row['description'] for row in reader}
 
-
 def get_ticker_list_from_file(tickers_csv_path):
     """Creates a list of tickers from a csv file listing tickers one per line.
     
@@ -32,7 +41,6 @@ def get_ticker_list_from_file(tickers_csv_path):
     with open(tickers_csv_path) as tickers:
         reader = csv.DictReader(tickers)
         return [row['ticker'] for row in reader]
-
 
 def get_ticker_string_from_list(ticker_list):
     """Returns a string of tickers separated by commas joined from a list."""
@@ -119,7 +127,6 @@ def save_formatted_csv(result_csv_path, header_list, ticker_list, answer_list):
     Arguments:    path to target file, header list, list of tickers, response list.
     Returns:    nothing.
     """
-    start = datetime.now()
     with open(result_csv_path, 'wb') as data:
         fieldnames = ['ticker'] + header_list
         writer = csv.DictWriter(data, fieldnames, quoting=csv.QUOTE_NONE, escapechar='\b')
@@ -128,9 +135,6 @@ def save_formatted_csv(result_csv_path, header_list, ticker_list, answer_list):
             row = construct_row(k, header_list, answer_list)
             row['ticker'] = ticker_list[k]
             writer.writerow(row)
-    finish = datetime.now()
-    diff = finish - start
-    print diff.total_seconds()
 
 def get_data(tickers_csv_path, result_csv_path):
     """Wrapper function, performs data retrieval/storage using other functions.
