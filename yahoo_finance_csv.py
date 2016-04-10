@@ -1,12 +1,11 @@
 import csv
 import requests
 from datetime import datetime
-import pandas as pd
+#import pandas as pd
 
 
 def timeit(func):
     """Timing decorator, prints out function name and execution time."""
-
     def timed(*args, **kwargs):
         start = datetime.now()
         result = func(*args, **kwargs)
@@ -65,6 +64,7 @@ def get_param_string_from_list(param_list):
     return ''.join(param_list)
 
 
+@timeit
 def get_answer_string(ticker_string, param_string):
     """Queries Yahoo Finance API, returns a CSV string with the response.
     
@@ -78,8 +78,7 @@ def get_answer_string(ticker_string, param_string):
         try:
             response = requests.get(url)
         except requests.exceptions.ConnectionError:
-#           change to logging
-            print 'Connection error'
+            print 'Connection error, trying again...'
         else:
             answer_string = response.text
             return answer_string
@@ -143,12 +142,20 @@ def save_formatted_csv(result_csv_path, header_list, ticker_list, answer_list):
             row['ticker'] = ticker_list[k]
             writer.writerow(row)
 
-
-def get_data(tickers_csv_path, result_csv_path):
+@timeit
+def retrieve(ticker_list, write_to_csv=False, result_csv_path=None):
     """Wrapper function, performs data retrieval/storage using other functions.
     
-    Arguments:    path to CSV file with tickers, path to write target for the data.
-    Returns:    nothing.
+    Arguments:
+        Required:
+            ticker_list --> list of ticker symbols
+        Optional:
+            write_to_csv --> boolean, retrieve writes data to a csv file if set to True, returns a pandas dataframe
+                             if set to False (default)
+            result_csv_path --> string, specifies path to csv file to write the data (overwrites the file).
+
+    Returns:
+        a pandas dataframe or None (if write_to_csv is set to False)
     """
     api_dict_csv_path = 'yahoo_api_dict.csv'
 
@@ -157,15 +164,15 @@ def get_data(tickers_csv_path, result_csv_path):
     param_list = get_param_list_from_api_dict(api_dict)
     param_string = get_param_string_from_list(param_list)
 
-    # create ticker string for the request
-    ticker_list = get_ticker_list_from_file(tickers_csv_path)
+    # create ticker string for the request)
     ticker_string = get_ticker_string_from_list(ticker_list)
 
     # make request and transform it into a list
     answer_string = get_answer_string(ticker_string, param_string)
     answer_list = get_answer_list_from_string(answer_string)
 
-    # create the csv file with resulting data
-    header_list = get_header_list(param_list, api_dict)
-    save_formatted_csv(result_csv_path, header_list, ticker_list, answer_list)
-
+    if write_to_csv:
+        header_list = get_header_list(param_list, api_dict)
+        save_formatted_csv(result_csv_path, header_list, ticker_list, answer_list)
+    else:
+        return answer_list
