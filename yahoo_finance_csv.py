@@ -1,7 +1,8 @@
 import csv
 import requests
 from datetime import datetime
-#import pandas as pd
+import pandas as pd
+import numpy as np
 
 
 def timeit(func):
@@ -99,9 +100,9 @@ def get_answer_list_from_string(answer_string):
     Arguments:    response string.
     Returns:    list generated from the string by comma-splitting.
     """
-    answer_list = answer_string.splitlines()
-    for i in range(len(answer_list)):
-        answer_list[i] = answer_list[i].split(',')
+    csv_rows_list = answer_string.splitlines()
+    reader = csv.reader(csv_rows_list)
+    answer_list = list(reader)
     return answer_list
 
 
@@ -142,22 +143,24 @@ def save_formatted_csv(result_csv_path, header_list, ticker_list, answer_list):
             row['ticker'] = ticker_list[k]
             writer.writerow(row)
 
+
 @timeit
-def retrieve(ticker_list, write_to_csv=False, result_csv_path=None):
+def current(ticker_csv_path, write_to_csv=False, result_csv_path=None, api_dict_csv_path='yahoo_api_dict.csv'):
     """Wrapper function, performs data retrieval/storage using other functions.
     
     Arguments:
-        Required:
-            ticker_list --> list of ticker symbols
-        Optional:
-            write_to_csv --> boolean, retrieve writes data to a csv file if set to True, returns a pandas dataframe
-                             if set to False (default)
-            result_csv_path --> string, specifies path to csv file to write the data (overwrites the file).
+        ticker_csv_path --> path to ticker csv file
+
+        write_to_csv --> boolean, retrieve writes data to a csv file if set to True, returns a pandas dataframe
+                         if set to False (default)
+
+        result_csv_path --> string, specifies path to csv file to write the data (overwrites the file).
+
+        api_dict_csv_path --> string, specifies path to csv file giving descriptions to Yahoo Finance parameters
 
     Returns:
         a pandas dataframe or None (if write_to_csv is set to False)
     """
-    api_dict_csv_path = 'yahoo_api_dict.csv'
 
     # create parameter string for the request
     api_dict = get_api_dict_from_file(api_dict_csv_path)
@@ -165,14 +168,20 @@ def retrieve(ticker_list, write_to_csv=False, result_csv_path=None):
     param_string = get_param_string_from_list(param_list)
 
     # create ticker string for the request)
+    ticker_list = sorted(get_ticker_list_from_file(ticker_csv_path))
     ticker_string = get_ticker_string_from_list(ticker_list)
 
     # make request and transform it into a list
     answer_string = get_answer_string(ticker_string, param_string)
     answer_list = get_answer_list_from_string(answer_string)
 
+    # lookup the parameter definitions and create a dictionary to be transformed into a pandas DataFrame
+    dict_for_pandas = {api_dict[param_list[index]]: item for index, item in enumerate(zip(*answer_list))}
+    pandas_dataframe = pd.DataFrame(dict_for_pandas)
+    pandas_dataframe.index = ticker_list
+    pandas_dataframe = pandas_dataframe.replace(to_replace='N/A', value=np.nan)
+
     if write_to_csv:
-        header_list = get_header_list(param_list, api_dict)
-        save_formatted_csv(result_csv_path, header_list, ticker_list, answer_list)
-    else:
-        return answer_list
+        pandas_dataframe.to_csv(result_csv_path)
+
+    return pandas_dataframe

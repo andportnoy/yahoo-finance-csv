@@ -68,4 +68,5 @@ docs/_build/
 target/
 
 #Ipython Notebook
+.ipynb
 .ipynb_checkpoints
