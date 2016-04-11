@@ -185,7 +185,7 @@ def current(tickers, write_to_csv=False, result_csv_path=None, api_dict_csv_path
         try:
             ticker_list = sorted(get_ticker_list_from_file(tickers))
         except Exception:
-            print 'File not found. Provide either a proper csv file or a list of tickers.'
+            print 'Please provide a proper csv file.'
         else:
             ticker_string = get_ticker_string_from_list(ticker_list)
 
