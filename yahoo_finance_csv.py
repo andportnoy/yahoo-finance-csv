@@ -180,9 +180,17 @@ def current(ticker_csv_path, write_to_csv=False, result_csv_path=None, api_dict_
     pandas_dataframe = pd.DataFrame(dict_for_pandas)
     pandas_dataframe.index = ticker_list
     pandas_dataframe = pandas_dataframe.replace(to_replace='N/A', value=np.nan)
+
+    # Drop columns that consist of NaN's only
     for item in pandas_dataframe:
         if pandas_dataframe[item].count() == 0:
             del pandas_dataframe[item]
+    # Convert columns to numeric if possible, raise exception and print column name otherwise
+    for colname in pandas_dataframe:
+        try:
+            pandas_dataframe[colname] = pd.to_numeric(pandas_dataframe[colname])
+        except ValueError:
+            print colname, 'could not be converted.'
 
     if write_to_csv:
         pandas_dataframe.to_csv(result_csv_path)
