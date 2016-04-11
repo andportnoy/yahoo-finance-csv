@@ -22,11 +22,11 @@ def get_api_dict_from_file(api_dict_csv_path):
 
 
     Arguments:
-        string containing path to API dictionary file.
+        api_dict_csv_path --> string containing path to API dictionary file
     File specs:
-        csv with columns 'parameter, description'.
+        csv with columns 'parameter, description'
     Returns:
-        a dictionary consisting of parameters and their descriptions.
+        a dictionary consisting of parameters and their descriptions
     """
     with open(api_dict_csv_path) as api:
         reader = csv.DictReader(api)
@@ -37,11 +37,11 @@ def get_ticker_list_from_file(tickers_csv_path):
     """Creates a list of tickers from a csv file listing tickers one per line.
     
     Arguments:
-        string containing path to tickers csv file.
+        tickers_csv_path --> string containing path to tickers csv file
     File specs:
-        csv with column 'ticker'.
+        csv with column 'ticker'
     Returns:
-        a list of ticker strings.
+        a list of ticker strings
     """
     with open(tickers_csv_path) as tickers:
         reader = csv.DictReader(tickers)
@@ -56,7 +56,7 @@ def get_ticker_string_from_list(ticker_list):
 
 
 def get_param_list_from_api_dict(api_dict):
-    """Returns the keys of an API dictionary."""
+    """Returns the keys of the API dictionary."""
     return api_dict.keys()
 
 
@@ -70,9 +70,10 @@ def get_answer_string(ticker_string, param_string):
     """Queries Yahoo Finance API, returns a CSV string with the response.
     
     Arguments:
-        comma-separated string of tickers, string of parameters.
+        ticker_string --> comma-separated string of tickers
+        param_string --> comm-separated string of Yahoo API parameters
     Returns:
-        response string, CSV formatted.
+        response string, CSV formatted
     """
     url = 'http://finance.yahoo.com/d/quotes.csv?s=' + ticker_string + '&f=' + param_string
     while True:
@@ -88,8 +89,11 @@ def get_answer_string(ticker_string, param_string):
 def get_header_list(param_list, api_dict):
     """Creates a header for a CSV data file.
     
-    Arguments:     list of parameters, Yahoo API dictionary.
-    Returns:     list of parameter descriptions retrieved from the API dictionary.
+    Arguments:
+        param_list --> list of Yahoo Finance API parameters formed by comma-splitting param_string
+        api_dict --> dictionary with Yahoo Finance API parameter descriptions mapped to parameters
+    Returns:
+        list of parameter descriptions retrieved from the API dictionary.
     """
     return [api_dict[param] for param in param_list]
 
@@ -97,8 +101,10 @@ def get_header_list(param_list, api_dict):
 def get_answer_list_from_string(answer_string):
     """Creates a list from the response string.
     
-    Arguments:    response string.
-    Returns:    list generated from the string by comma-splitting.
+    Arguments:
+        answer_string --> text content of Yahoo Finance API request response
+    Returns:
+        list generated from the string by comma-splitting
     """
     csv_rows_list = answer_string.splitlines()
     reader = csv.reader(csv_rows_list)
@@ -109,8 +115,11 @@ def get_answer_list_from_string(answer_string):
 def save_raw_answer_to_file(answer_path, answer_string):
     """Saves the response string to a specified path.
     
-    Arguments:    path to target, response string.
-    Returns:    nothing.
+    Arguments:
+        answer_path --> path to target
+        answer_string --> text content of Yahoo Finance API request response
+    Returns:
+        nothing
     """
     with open(answer_path, 'wb') as raw_data:
         raw_data.write(answer_string)
@@ -121,7 +130,9 @@ def construct_row(k, header_list, answer_list):
     """Creates a row of data for a CSV file (to be used with csv.DictWriter).
     
     Arguments:
-        position of observation sublist on the response list, header list, list formed from the response.
+        k --> position of observation sublist on the response list
+        header_list --> list of parameter names except 'ticker'
+        answer_list --> list formed by comma-splitting answer_string
     Returns:
         row of data in form of a dictionary.
     """
@@ -131,8 +142,13 @@ def construct_row(k, header_list, answer_list):
 def save_formatted_csv(result_csv_path, header_list, ticker_list, answer_list):
     """Writes the data from the response list to a CSV file using csv.DictWriter.
     
-    Arguments:    path to target file, header list, list of tickers, response list.
-    Returns:    nothing.
+    Arguments:
+        result_csv_path -- > path to target csv file (existing file will be overwritten)
+        header_list --> list of parameter descriptions
+        ticker_list --> list of tickers for which data is to be retrieved
+        answer_list --> list formed by comma-splitting answer_string
+    Returns:
+        nothing
     """
     with open(result_csv_path, 'wb') as data:
         fieldnames = ['ticker'] + header_list
@@ -150,12 +166,9 @@ def current(ticker_csv_path, write_to_csv=False, result_csv_path=None, api_dict_
     
     Arguments:
         ticker_csv_path --> path to ticker csv file
-
         write_to_csv --> boolean, retrieve writes data to a csv file if set to True, returns a pandas dataframe
                          if set to False (default)
-
-        result_csv_path --> string, specifies path to csv file to write the data (overwrites the file).
-
+        result_csv_path --> string, specifies path to csv file to write the data (overwrites the file)
         api_dict_csv_path --> string, specifies path to csv file giving descriptions to Yahoo Finance parameters
 
     Returns:
@@ -185,6 +198,7 @@ def current(ticker_csv_path, write_to_csv=False, result_csv_path=None, api_dict_
     for item in pandas_dataframe:
         if pandas_dataframe[item].count() == 0:
             del pandas_dataframe[item]
+            
     # Convert columns to numeric if possible, raise exception and print column name otherwise
     for colname in pandas_dataframe:
         try:
