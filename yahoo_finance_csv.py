@@ -199,7 +199,7 @@ def current(ticker_csv_path, write_to_csv=False, result_csv_path=None, api_dict_
         if pandas_dataframe[item].count() == 0:
             del pandas_dataframe[item]
 
-    # Convert columns to numeric if possible, raise exception and print column name otherwise
+    # Convert columns to numeric if possible, handle exception and print column name otherwise
     for colname in pandas_dataframe:
         try:
             pandas_dataframe[colname] = pd.to_numeric(pandas_dataframe[colname])
