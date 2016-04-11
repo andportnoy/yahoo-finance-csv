@@ -206,6 +206,8 @@ def current(ticker_csv_path, write_to_csv=False, result_csv_path=None, api_dict_
         except ValueError:
             print colname, 'could not be converted.'
 
+    # TODO Convert columns to datetimes if possible
+    
     if write_to_csv:
         pandas_dataframe.to_csv(result_csv_path)
 
