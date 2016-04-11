@@ -1,3 +1,4 @@
+import sys
 import csv
 import requests
 from datetime import datetime
@@ -185,7 +186,7 @@ def current(tickers, write_to_csv=False, result_csv_path=None, api_dict_csv_path
         try:
             ticker_list = sorted(get_ticker_list_from_file(tickers))
         except Exception:
-            print 'File not found. Provide either a proper csv file or a list of tickers.'
+            sys.exit('File not found. Provide either a proper csv file or a list of tickers.')
         else:
             ticker_string = get_ticker_string_from_list(ticker_list)
 
