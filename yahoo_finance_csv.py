@@ -180,6 +180,9 @@ def current(ticker_csv_path, write_to_csv=False, result_csv_path=None, api_dict_
     pandas_dataframe = pd.DataFrame(dict_for_pandas)
     pandas_dataframe.index = ticker_list
     pandas_dataframe = pandas_dataframe.replace(to_replace='N/A', value=np.nan)
+    for item in pandas_dataframe:
+        if pandas_dataframe[item].count() == 0:
+            del pandas_dataframe[item]
 
     if write_to_csv:
         pandas_dataframe.to_csv(result_csv_path)
