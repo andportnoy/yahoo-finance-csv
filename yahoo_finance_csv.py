@@ -161,7 +161,7 @@ def save_formatted_csv(result_csv_path, header_list, ticker_list, answer_list):
 
 
 @timeit
-def current(tickers, write_to_csv=False, result_csv_path=None, api_dict_csv_path='yahoo_api_dict.csv'):
+def current(ticker_csv_path, write_to_csv=False, result_csv_path=None, api_dict_csv_path='yahoo_api_dict.csv'):
     """Wrapper function, performs data retrieval/storage using other functions.
     
     Arguments:
@@ -181,22 +181,8 @@ def current(tickers, write_to_csv=False, result_csv_path=None, api_dict_csv_path
     param_string = get_param_string_from_list(param_list)
 
     # create ticker string for the request
-    if type(tickers) == str:
-        try:
-            ticker_list = sorted(get_ticker_list_from_file(tickers))
-        except Exception:
-            print 'Please provide a proper csv file.'
-        else:
-            ticker_string = get_ticker_string_from_list(ticker_list)
-
-    elif type(tickers) == list:
-        ticker_list = tickers
-        try:
-            ticker_string = get_ticker_string_from_list(ticker_list)
-        except Exception:
-            print Exception
-    else:
-        raise Exception('Please provide either a csv file or a list of tickers.')
+    ticker_list = sorted(get_ticker_list_from_file(ticker_csv_path))
+    ticker_string = get_ticker_string_from_list(ticker_list)
 
     # make request and transform it into a list
     answer_string = get_answer_string(ticker_string, param_string)
