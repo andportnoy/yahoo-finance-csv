@@ -1,5 +1,5 @@
 # Yahoo Finance to CSV
-A tiny Yahoo Finance API that lets you save ticker data to a csv file
+A tiny Yahoo Finance API that lets you export ticker data as a Pandas DataFrame
 
 # To-dos:
 - [ ] add exception handling
