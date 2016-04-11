@@ -134,7 +134,7 @@ def construct_row(k, header_list, answer_list):
         header_list --> list of parameter names except 'ticker'
         answer_list --> list formed by comma-splitting answer_string
     Returns:
-        row of data in form of a dictionary.
+        row of data in form of a dictionary
     """
     return {header_list[i]: answer_list[k][i] for i in xrange(len(header_list))}
 
@@ -198,7 +198,7 @@ def current(ticker_csv_path, write_to_csv=False, result_csv_path=None, api_dict_
     for item in pandas_dataframe:
         if pandas_dataframe[item].count() == 0:
             del pandas_dataframe[item]
-            
+
     # Convert columns to numeric if possible, raise exception and print column name otherwise
     for colname in pandas_dataframe:
         try:
