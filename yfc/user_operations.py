@@ -71,3 +71,12 @@ def historical(ticker, from_date=None, to_date=None):
 
     # TODO Finish this
     return pandas_dataframe
+
+def covariance_matrix(ticker_list):
+    """Calculates a correlation matrix for the stocks in ticker_list.
+
+    This function is a one-liner and it uses lambda, zip, map, reduce and listcomps.
+    Why be a king... when you can be a god... of unreadable code.
+    """
+
+    return reduce(lambda df1, df2: df1.join(df2, how='inner'), [df[['Close']].rename(columns={'Close': ticker}) for ticker, df in zip(ticker_list, map(historical, ticker_list))]).corr()

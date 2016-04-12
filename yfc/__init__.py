@@ -1,1 +1,1 @@
-from user_operations import current, historical
+from user_operations import current, historical, covariance_matrix
