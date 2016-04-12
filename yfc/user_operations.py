@@ -1,5 +1,5 @@
-import data_operations as dops
-from decorators import *
+import _data_operations as dops
+from _decorators import *
 
 
 @timeit
@@ -35,13 +35,13 @@ def current(tickers, write_to_csv=False, result_csv_path=None, api_dict_csv_path
             raise Exception('Please provide either a csv file or a list of tickers.')
     except Exception:
         quit(Exception.message)
+    else:
+        # make request and create a pandas dataframe from the response
+        answer_string = dops.get_answer_string(ticker_string, param_string)
+        answer_list = dops.get_answer_list_from_string(answer_string)
+        pandas_dataframe = dops.make_pd_dataframe(api_dict, answer_list, param_list, ticker_list)
 
-    # make request and create a pandas dataframe from the response
-    answer_string = dops.get_answer_string(ticker_string, param_string)
-    answer_list = dops.get_answer_list_from_string(answer_string)
-    pandas_dataframe = dops.make_pd_dataframe(api_dict, answer_list, param_list, ticker_list)
+        if write_to_csv:
+            pandas_dataframe.to_csv(result_csv_path)
 
-    if write_to_csv:
-        pandas_dataframe.to_csv(result_csv_path)
-
-    return pandas_dataframe
+        return pandas_dataframe

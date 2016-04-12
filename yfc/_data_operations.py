@@ -2,7 +2,7 @@ import csv
 import requests
 import pandas as pd
 import numpy as np
-from decorators import *
+from _decorators import *
 
 
 def get_api_dict_from_file(api_dict_csv_path):
@@ -18,7 +18,9 @@ def get_api_dict_from_file(api_dict_csv_path):
     """
     with open(api_dict_csv_path) as api:
         reader = csv.DictReader(api)
-        return {row['parameter']: row['description'] for row in reader}
+        api_dict = {row['parameter']: row['description'] for row in reader}
+
+    return api_dict
 
 
 def get_ticker_list_from_file(tickers_csv_path):
