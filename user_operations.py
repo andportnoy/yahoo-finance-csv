@@ -1,5 +1,3 @@
-import pandas as pd
-import numpy as np
 import data_operations as dops
 from decorators import *
 
@@ -24,7 +22,7 @@ def current(tickers, write_to_csv=False, result_csv_path=None, api_dict_csv_path
     param_list = dops.get_param_list_from_api_dict(api_dict)
     param_string = dops.get_param_string_from_list(param_list)
 
-
+    # list of tickers or path to a csv file with tickers?
     try:
         if type(tickers) == str:
             ticker_list = sorted(dops.get_ticker_list_from_file(tickers))
@@ -38,14 +36,10 @@ def current(tickers, write_to_csv=False, result_csv_path=None, api_dict_csv_path
     except Exception:
         quit(Exception.message)
 
-    # make request and transform it into a list
+    # make request and create a pandas dataframe from the response
     answer_string = dops.get_answer_string(ticker_string, param_string)
     answer_list = dops.get_answer_list_from_string(answer_string)
-
     pandas_dataframe = dops.make_pd_dataframe(api_dict, answer_list, param_list, ticker_list)
-
-    # Convert columns to numeric if possible, handle exception and print column name otherwise
-
 
     if write_to_csv:
         pandas_dataframe.to_csv(result_csv_path)
