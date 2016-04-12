@@ -95,7 +95,7 @@ def correlation_matrix(tickers):
         not_nones = [(ticker, df) for ticker, df in full_dfs if df is not None]
 
         # use only the 'Close' column
-        close_only = [(ticker, df[['Close']]) for ticker, df in full_dfs]
+        close_only = [(ticker, df[['Close']]) for ticker, df in not_nones]
 
         # replace 'Close' in all dataframes with their tickers
         renamed = [df.rename(columns={'Close': ticker}) for ticker, df in close_only]
