@@ -96,6 +96,9 @@ def get_date_components(date_object):
 
         return m, d, y
 
+class NoHistoricalDataError(Exception):
+    def __init__(self, message):
+        self.message = message
 
 @timeit
 def get_historical_answer_string(ticker, from_date=None, to_date=None):
@@ -115,6 +118,8 @@ def get_historical_answer_string(ticker, from_date=None, to_date=None):
                 raise Exception('No historical data for ticker ' + params['s'])
         except requests.exceptions.ConnectionError:
             print 'Connection error, trying again...'
+        except NoHistoricalDataError:
+            return None
         else:
             answer_string = response.text
             return answer_string

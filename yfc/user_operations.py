@@ -91,6 +91,9 @@ def correlation_matrix(tickers):
         # iterate through tuples of tickers and corresponding dataframes
         full_dfs = zip(ticker_list, map(historical, ticker_list))
 
+        # throw out the Nones
+        not_nones = [(ticker, df) for ticker, df in full_dfs if df is not None]
+
         # use only the 'Close' column
         close_only = [(ticker, df[['Close']]) for ticker, df in full_dfs]
 
