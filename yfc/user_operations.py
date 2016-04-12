@@ -73,19 +73,31 @@ def historical(ticker, from_date=None, to_date=None):
     return pandas_dataframe
 
 @timeit
-def correlation_matrix(ticker_list):
+def correlation_matrix(tickers):
     """Calculates a correlation matrix for the stocks in ticker_list."""
 
-    # iterate through tuples of tickers and corresponding dataframes
-    full_dfs = zip(ticker_list, map(historical, ticker_list))
+    try:
+        if type(tickers) == str:
+            ticker_list = sorted(dops.get_ticker_list_from_file(tickers))
 
-    # use only the 'Close' column
-    close_only = [(ticker, df[['Close']]) for ticker, df in full_dfs]
+        elif type(tickers) == list:
+            ticker_list = tickers
+        else:
+            raise Exception('Please provide either a csv file or a list of tickers.')
+    except Exception:
+        quit(Exception.message)
+    else:
 
-    # replace 'Close' in all dataframes with their tickers
-    renamed = [df.rename(columns={'Close': ticker}) for ticker, df in close_only]
+        # iterate through tuples of tickers and corresponding dataframes
+        full_dfs = zip(ticker_list, map(historical, ticker_list))
 
-    # inner-join all the dataframes by index ('Date')
-    joined = reduce(lambda df1, df2: df1.join(df2, how='inner'), renamed)
+        # use only the 'Close' column
+        close_only = [(ticker, df[['Close']]) for ticker, df in full_dfs]
 
-    return joined.corr()
+        # replace 'Close' in all dataframes with their tickers
+        renamed = [df.rename(columns={'Close': ticker}) for ticker, df in close_only]
+
+        # inner-join all the dataframes by index ('Date')
+        joined = reduce(lambda df1, df2: df1.join(df2, how='inner'), renamed)
+
+        return joined.corr()
