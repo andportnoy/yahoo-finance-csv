@@ -1,5 +1,5 @@
 # Yahoo Finance to CSV
-A tiny Yahoo Finance API that lets you retrieve realtime and historical (not yet) stock data
+A tiny Yahoo Finance API that lets you retrieve realtime and historical ~~(not yet)~~ stock data
 
 # Development goals
 Provide two main functions  
@@ -9,7 +9,7 @@ Provide two main functions
 # To-dos:
 - [ ] add tests
 - [ ] add documentation
-- [ ] add `historical`
+- [x] add `historical`
 - [ ] see if using [YQL](https://github.com/lukaszbanasiak/yahoo-finance/blob/master/yahoo_finance/yql.py) is faster
 - [x] add pandas capabilities (option to return a pandas dataframe)
 - [x] handle N/A values for data (using pandas)
