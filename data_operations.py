@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 from decorators import *
 
+
 def get_api_dict_from_file(api_dict_csv_path):
     """Creates a dictionary of Yahoo Finance API parameters from a csv file.
 
@@ -162,6 +163,7 @@ def make_pd_dataframe(api_dict, answer_list, param_list, ticker_list):
     # TODO Parse values with M, B for million/billion
 
     return pandas_dataframe
+
 
 def save_formatted_csv(result_csv_path, header_list, ticker_list, answer_list):
     """DEPRECATED: use write_to_csv option instead.
