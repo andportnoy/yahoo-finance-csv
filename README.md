@@ -2,7 +2,7 @@
 A tiny Yahoo Finance API that lets you retrieve realtime and historical (not yet) stock data
 
 # Development goals
-Provide two main functions:
+Provide two main functions  
 1. `current`, delivering realtime stock data as fast as possible
 2. `historical`, exporting historical price data as a clean Pandas DataFrame
 
