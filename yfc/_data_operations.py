@@ -1,3 +1,4 @@
+import os
 import csv
 import requests
 import pandas as pd
@@ -5,7 +6,7 @@ import numpy as np
 from _decorators import *
 
 
-def get_api_dict_from_file(api_dict_csv_path):
+def read_api_dict():
     """Creates a dictionary of Yahoo Finance API parameters from a csv file.
 
 
@@ -16,6 +17,7 @@ def get_api_dict_from_file(api_dict_csv_path):
     Returns:
         a dictionary consisting of parameters and their descriptions
     """
+    api_dict_csv_path = os.path.join(os.path.dirname(__file__), 'yahoo_api_dict.csv')
     with open(api_dict_csv_path) as api:
         reader = csv.DictReader(api)
         api_dict = {row['parameter']: row['description'] for row in reader}

@@ -18,7 +18,7 @@ def current(tickers, write_to_csv=False, result_csv_path=None, api_dict_csv_path
     """
 
     # create parameter string for the request
-    api_dict = dops.get_api_dict_from_file(api_dict_csv_path)
+    api_dict = dops.read_api_dict()
     param_list = dops.get_param_list_from_api_dict(api_dict)
     param_string = dops.get_param_string_from_list(param_list)
 
