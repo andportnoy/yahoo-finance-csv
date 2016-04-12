@@ -3,10 +3,11 @@ import numpy as np
 import data_operations as dops
 from decorators import *
 
+
 @timeit
-def current(ticker_csv_path, write_to_csv=False, result_csv_path=None, api_dict_csv_path='yahoo_api_dict.csv'):
+def current(tickers, write_to_csv=False, result_csv_path=None, api_dict_csv_path='yahoo_api_dict.csv'):
     """Wrapper function, performs data retrieval/storage using other functions.
-    
+
     Arguments:
         ticker_csv_path --> path to ticker csv file
         write_to_csv --> boolean, retrieve writes data to a csv file if set to True, returns a pandas dataframe
@@ -24,8 +25,19 @@ def current(ticker_csv_path, write_to_csv=False, result_csv_path=None, api_dict_
     param_string = dops.get_param_string_from_list(param_list)
 
     # create ticker string for the request
-    ticker_list = sorted(dops.get_ticker_list_from_file(ticker_csv_path))
-    ticker_string = dops.get_ticker_string_from_list(ticker_list)
+
+    try:
+        if type(tickers) == str:
+            ticker_list = sorted(dops.get_ticker_list_from_file(tickers))
+            ticker_string = dops.get_ticker_string_from_list(ticker_list)
+
+        elif type(tickers) == list:
+            ticker_list = tickers
+            ticker_string = dops.get_ticker_string_from_list(ticker_list)
+        else:
+            raise Exception('Please provide either a csv file or a list of tickers.')
+    except Exception:
+        quit(Exception.message)
 
     # make request and transform it into a list
     answer_string = dops.get_answer_string(ticker_string, param_string)
@@ -51,7 +63,7 @@ def current(ticker_csv_path, write_to_csv=False, result_csv_path=None, api_dict_
 
     # TODO Convert columns to datetimes if possible
     # TODO Parse values with M, B for million/billion
-    
+
     if write_to_csv:
         pandas_dataframe.to_csv(result_csv_path)
 
