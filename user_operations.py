@@ -9,7 +9,7 @@ def current(tickers, write_to_csv=False, result_csv_path=None, api_dict_csv_path
     """Wrapper function, performs data retrieval/storage using other functions.
 
     Arguments:
-        ticker_csv_path --> path to ticker csv file
+        tickers --> path to ticker csv file or list of tickers
         write_to_csv --> boolean, retrieve writes data to a csv file if set to True, returns a pandas dataframe
                          if set to False (default)
         result_csv_path --> string, specifies path to csv file to write the data (overwrites the file)
