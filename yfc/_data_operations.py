@@ -220,6 +220,12 @@ def historical_pd_dataframe(answer_list):
     pandas_dataframe = pandas_dataframe[columns]
     del pandas_dataframe['Date']
 
+    for colname in pandas_dataframe:
+        try:
+            pandas_dataframe[colname] = pd.to_numeric(pandas_dataframe[colname])
+        except ValueError:
+            print colname, 'could not be converted.'
+
     return pandas_dataframe
 
 
