@@ -73,9 +73,9 @@ def historical(ticker, from_date=None, to_date=None):
     return pandas_dataframe
 
 
-def covariance_matrix(ticker_list):
+def correlation_matrix(ticker_list):
     """Calculates a correlation matrix for the stocks in ticker_list."""
-    
+
     # iterate through tuples of tickers and corresponding dataframes
     full_dfs = zip(ticker_list, map(historical, ticker_list))
 
