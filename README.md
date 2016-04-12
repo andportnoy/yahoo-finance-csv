@@ -15,3 +15,8 @@ Provide two main functions:
 - [x] handle N/A values for data (using pandas)
 - [ ] parse numeric values that can't be converted using `pd.to_numeric` (e.g. EBITDA with letters M, B for million and billion)
 - [ ] add graphing capabilities (matplotlib or seaborn)
+
+# Museum
+
+Insane one-liner that computes a correlation matrix for a list of tickers with lambda, zip, map, reduce, and listcomps inside:  
+>return reduce(lambda df1, df2: df1.join(df2, how='inner'), [df[['Close']].rename(columns={'Close': ticker}) for ticker, df in zip(ticker_list, map(historical, ticker_list))]).corr()
