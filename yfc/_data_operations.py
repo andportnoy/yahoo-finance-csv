@@ -88,11 +88,12 @@ def get_date_components(date_object):
     Returns:
         (m, d, y) --> month, day, year (integers)
     """
-
+    # TODO implement datetime, datetime64 and Timestamp handling
     if type(date_object) == str:
         date_string = date_object
         y, m, d = [int(i) for i in date_string.split('-')]
         m -= 1  # Need to decrement, Yahoo has 0-indexing for months
+
         return m, d, y
 
 
