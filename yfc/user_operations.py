@@ -72,11 +72,20 @@ def historical(ticker, from_date=None, to_date=None):
     # TODO Finish this
     return pandas_dataframe
 
+
 def covariance_matrix(ticker_list):
-    """Calculates a correlation matrix for the stocks in ticker_list.
+    """Calculates a correlation matrix for the stocks in ticker_list."""
+    
+    # iterate through tuples of tickers and corresponding dataframes
+    full_dfs = zip(ticker_list, map(historical, ticker_list))
 
-    This function is a one-liner and it uses lambda, zip, map, reduce and listcomps.
-    Why be a king... when you can be a god... of unreadable code.
-    """
+    # use only the 'Close' column
+    close_only = [(ticker, df[['Close']]) for ticker, df in full_dfs]
 
-    return reduce(lambda df1, df2: df1.join(df2, how='inner'), [df[['Close']].rename(columns={'Close': ticker}) for ticker, df in zip(ticker_list, map(historical, ticker_list))]).corr()
+    # replace 'Close' in all dataframes with their tickers
+    renamed = [df.rename(columns={'Close': ticker}) for ticker, df in close_only]
+
+    # inner-join all the dataframes by index ('Date')
+    joined = reduce(lambda df1, df2: df1.join(df2, how='inner'), renamed)
+
+    return joined.corr()
