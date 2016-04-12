@@ -58,7 +58,7 @@ def get_param_string_from_list(param_list):
 
 
 @timeit
-def get_answer_string(ticker_string, param_string):
+def get_current_answer_string(ticker_string, param_string):
     """Queries Yahoo Finance API, returns a CSV string with the response.
 
     Arguments:
@@ -67,10 +67,49 @@ def get_answer_string(ticker_string, param_string):
     Returns:
         response string, CSV formatted
     """
-    url = 'http://finance.yahoo.com/d/quotes.csv?s=' + ticker_string + '&f=' + param_string
+    base_url = 'http://finance.yahoo.com/d/quotes.csv'
+    params = {'s': ticker_string, 'f': param_string}
+
     while True:
         try:
-            response = requests.get(url)
+            response = requests.get(base_url, params)
+        except requests.exceptions.ConnectionError:
+            print 'Connection error, trying again...'
+        else:
+            answer_string = response.text
+            return answer_string
+
+
+def get_date_components(date_object):
+    """Extracts components dates for a historical data request.
+
+    Arguments:
+        date_object --> string date, Python datetime, NumPy datetime64 or pandas Timestamp
+    Returns:
+        (m, d, y) --> month, day, year (integers)
+    """
+
+    if type(date_object) == str:
+        date_string = date_object
+        y, m, d = [int(i) for i in date_string.split('-')]
+        m -= 1  # Need to decrement, Yahoo has 0-indexing for months
+        return m, d, y
+
+
+@timeit
+def get_historical_answer_string(ticker, from_date=None, to_date=None):
+
+    base_url = 'http://real-chart.finance.yahoo.com/table.csv'
+
+    params = {'s': ticker}
+    if from_date is not None:
+        params['a'], params['b'], params['c'] = get_date_components(from_date)
+    if to_date is not None:
+        params['d'], params['e'], params['f'] = get_date_components(to_date)
+
+    while True:
+        try:
+            response = requests.get(base_url, params)
         except requests.exceptions.ConnectionError:
             print 'Connection error, trying again...'
         else:
@@ -131,7 +170,7 @@ def construct_row(k, header_list, answer_list):
     return {header_list[i]: answer_list[k][i] for i in xrange(len(header_list))}
 
 
-def make_pd_dataframe(api_dict, answer_list, param_list, ticker_list):
+def current_pd_dataframe(api_dict, answer_list, param_list, ticker_list):
     """Constructs a pandas DataFrame from a data dictionary and cleans it.
 
     Arguments:
@@ -142,7 +181,8 @@ def make_pd_dataframe(api_dict, answer_list, param_list, ticker_list):
 
     Returns:
         pandas_dataframe --> configuration: rows are companies, columns are parameter definitions
-                             wrangling: - 'N/A's are replaced with NumPy NaNs
+                             wrangling:
+                                        - 'N/A's are replaced with NumPy NaNs
                                         - all-NaN columns are dropped
                                         - where possible, columns are converted to numeric
     """
@@ -165,6 +205,18 @@ def make_pd_dataframe(api_dict, answer_list, param_list, ticker_list):
 
     # TODO Convert columns to datetimes if possible
     # TODO Parse values with M, B for million/billion
+
+    return pandas_dataframe
+
+
+def historical_pd_dataframe(answer_list):
+
+    columns, data = answer_list[0], answer_list[1:]
+
+    dict_for_pandas = {columns[index]: item for index, item in enumerate(zip(*data))}
+
+    pandas_dataframe = pd.DataFrame(dict_for_pandas)
+    pandas_dataframe.index = pandas_dataframe['Date']
 
     return pandas_dataframe
 
