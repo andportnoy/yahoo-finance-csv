@@ -11,7 +11,7 @@ def read_api_dict():
 
 
     Arguments:
-        api_dict_csv_path --> string containing path to API dictionary file
+        takes no arguments
     File specs:
         csv with columns 'parameter, description'
     Returns:
