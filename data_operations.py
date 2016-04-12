@@ -1,5 +1,6 @@
 import csv
 import requests
+from decorators import *
 
 def get_api_dict_from_file(api_dict_csv_path):
     """Creates a dictionary of Yahoo Finance API parameters from a csv file.
@@ -27,8 +28,8 @@ def get_ticker_list_from_file(tickers_csv_path):
     Returns:
         a list of ticker strings
     """
-    with open(tickers_csv_path) as tickers:
-        reader = csv.DictReader(tickers)
+    with open(tickers_csv_path) as tickers_file:
+        reader = csv.DictReader(tickers_file)
         return [row['ticker'] for row in reader]
 
 
