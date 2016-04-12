@@ -54,7 +54,7 @@ j,52_week_low
 j5,change_from_52_week_low
 k4,change_from_52_week_high
 j6,percent_change_from_52_week_low
-k5,percentwchange_from_52_week_high
+k5,percent_change_from_52_week_high
 w,52_week_range
 v,more_info
 j1,market_capitalization
@@ -83,5 +83,5 @@ r,PE_ratio
 r2,PE_ratio_realtime
 r5,PEG_ratio
 r6,price_to_EPS_estimate_current_year
-r7,price_toweps_estimate_next_year
+r7,price_to_eps_estimate_next_year
 s7,short_ratio

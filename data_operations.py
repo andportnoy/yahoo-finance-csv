@@ -1,6 +1,9 @@
 import csv
 import requests
+import pandas as pd
+import numpy as np
 from decorators import *
+
 
 def get_api_dict_from_file(api_dict_csv_path):
     """Creates a dictionary of Yahoo Finance API parameters from a csv file.
@@ -124,8 +127,47 @@ def construct_row(k, header_list, answer_list):
     return {header_list[i]: answer_list[k][i] for i in xrange(len(header_list))}
 
 
+def make_pd_dataframe(api_dict, answer_list, param_list, ticker_list):
+    """Constructs a pandas DataFrame from a data dictionary and cleans it.
+
+    Arguments:
+        api_dict --> dictionary containing Yahoo Finance API parameters and their definitions
+        answer_list --> list of lists containing rows for future DataFrame
+        param_list --> list of Yahoo Finance API parameters that were used to request data
+        ticker_list --> list of tickers for which data was requested
+
+    Returns:
+        pandas_dataframe --> configuration: rows are companies, columns are parameter definitions
+                             wrangling: - 'N/A's are replaced with NumPy NaNs
+                                        - all-NaN columns are dropped
+                                        - where possible, columns are converted to numeric
+    """
+    
+    dict_for_pandas = {api_dict[param_list[index]]: item for index, item in enumerate(zip(*answer_list))}
+
+    pandas_dataframe = pd.DataFrame(dict_for_pandas)
+    pandas_dataframe.index = ticker_list
+    pandas_dataframe = pandas_dataframe.replace(to_replace='N/A', value=np.nan)
+
+    for item in pandas_dataframe:
+        if pandas_dataframe[item].count() == 0:
+            del pandas_dataframe[item]
+
+    for colname in pandas_dataframe:
+        try:
+            pandas_dataframe[colname] = pd.to_numeric(pandas_dataframe[colname])
+        except ValueError:
+            print colname, 'could not be converted.'
+
+    # TODO Convert columns to datetimes if possible
+    # TODO Parse values with M, B for million/billion
+
+    return pandas_dataframe
+
+
 def save_formatted_csv(result_csv_path, header_list, ticker_list, answer_list):
-    """Writes the data from the response list to a CSV file using csv.DictWriter.
+    """DEPRECATED: use write_to_csv option instead.
+    Writes the data from the response list to a CSV file using csv.DictWriter.
 
     Arguments:
         result_csv_path -- > path to target csv file (existing file will be overwritten)
