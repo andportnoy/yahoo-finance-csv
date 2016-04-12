@@ -72,6 +72,7 @@ def historical(ticker, from_date=None, to_date=None):
     # TODO Finish this
     return pandas_dataframe
 
+
 @timeit
 def correlation_matrix(tickers):
     """Calculates a correlation matrix for the stocks in ticker_list."""

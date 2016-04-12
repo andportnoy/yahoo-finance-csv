@@ -96,9 +96,13 @@ def get_date_components(date_object):
 
         return m, d, y
 
+
 class NoHistoricalDataError(Exception):
     def __init__(self, message):
         self.message = message
+
+# TODO move to separate exceptions file
+
 
 @timeit
 def get_historical_answer_string(ticker, from_date=None, to_date=None):
