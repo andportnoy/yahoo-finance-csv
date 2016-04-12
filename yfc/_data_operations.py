@@ -145,6 +145,9 @@ def get_answer_list_from_string(answer_string):
     Returns:
         list generated from the string by comma-splitting
     """
+
+    if answer_string is None:
+        return None
     csv_rows_list = answer_string.splitlines()
     reader = csv.reader(csv_rows_list)
     answer_list = list(reader)
@@ -218,6 +221,9 @@ def current_pd_dataframe(api_dict, answer_list, param_list, ticker_list):
 
 
 def historical_pd_dataframe(answer_list):
+
+    if answer_list is None:
+        return None
 
     columns, data = answer_list[0], answer_list[1:]
 
