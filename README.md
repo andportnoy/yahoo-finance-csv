@@ -20,5 +20,5 @@ Provide two main functions:
 
 Insane one-liner that computes a correlation matrix for a list of tickers with lambda, zip, map, reduce, and listcomps inside:  
 ```python
-return reduce(lambda df1, df2: df1.join(df2, how='inner'), [df[['Close']].rename(columns={'Close': ticker}) for ticker, df in zip(ticker_list, map(historical, ticker_list))]).corr()
+reduce(lambda df1, df2: df1.join(df2, how='inner'), [df[['Close']].rename(columns={'Close': ticker}) for ticker, df in zip(ticker_list, map(historical, ticker_list))]).corr()
 ```
