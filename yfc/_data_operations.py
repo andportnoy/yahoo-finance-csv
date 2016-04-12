@@ -217,6 +217,7 @@ def historical_pd_dataframe(answer_list):
 
     pandas_dataframe = pd.DataFrame(dict_for_pandas)
     pandas_dataframe.index = pandas_dataframe['Date']
+    pandas_dataframe = pandas_dataframe[columns]
     del pandas_dataframe['Date']
 
     return pandas_dataframe
