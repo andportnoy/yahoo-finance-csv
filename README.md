@@ -24,7 +24,7 @@ You can visualize the correlation matrix using [seaborn](https://stanford.edu/~m
 
 # Development goals
 Provide two main functions:  
-1. `current`, delivering realtime stock data as fast as possible  
+1. `current`, delivering realtime stock data as fast as possible (as of now, it returns a pandas DataFrame, which is slower than raw data; the end user might prefer a different format)  
 2. `historical`, exporting historical price data as a clean Pandas DataFrame
 
 # To-dos:
