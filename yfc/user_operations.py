@@ -1,6 +1,6 @@
-import _data_operations as dops
-from ._decorators import *
-from ._exceptions import *
+import _data_operations as dataops
+from ._decorators import timeit
+from ._exceptions import BadTickersFormat
 
 
 @timeit
@@ -18,28 +18,28 @@ def current(tickers, write_to_csv=False, result_csv_path=None):
     """
 
     # create parameter string for the request
-    api_dict = dops.read_api_dict()
-    param_list = dops.get_param_list_from_api_dict(api_dict)
-    param_string = dops.get_param_string_from_list(param_list)
+    api_dict = dataops.read_api_dict()
+    param_list = dataops.get_param_list_from_api_dict(api_dict)
+    param_string = dataops.get_param_string_from_list(param_list)
 
     # list of tickers or path to a csv file with tickers?
     try:
         if type(tickers) == str:
-            ticker_list = sorted(dops.get_ticker_list_from_file(tickers))
-            ticker_string = dops.get_ticker_string_from_list(ticker_list)
+            ticker_list = sorted(dataops.get_ticker_list_from_file(tickers))
+            ticker_string = dataops.get_ticker_string_from_list(ticker_list)
 
         elif type(tickers) == list:
             ticker_list = tickers
-            ticker_string = dops.get_ticker_string_from_list(ticker_list)
+            ticker_string = dataops.get_ticker_string_from_list(ticker_list)
         else:
             raise BadTickersFormat('Please provide either a csv file or a list of tickers.')
     except BadTickersFormat as err:
         quit(err.message)
     else:
         # make request and create a pandas dataframe from the response
-        answer_string = dops.get_current_answer_string(ticker_string, param_string)
-        answer_list = dops.get_answer_list_from_string(answer_string)
-        pandas_dataframe = dops.current_pd_dataframe(api_dict, answer_list, param_list, ticker_list)
+        answer_string = dataops.get_current_answer_string(ticker_string, param_string)
+        answer_list = dataops.get_answer_list_from_string(answer_string)
+        pandas_dataframe = dataops.current_pd_dataframe(api_dict, answer_list, param_list, ticker_list)
 
         if write_to_csv:
             pandas_dataframe.to_csv(result_csv_path)
@@ -66,9 +66,9 @@ def historical(ticker, from_date=None, to_date=None):
         Pandas DataFrame
     """
 
-    answer_string = dops.get_historical_answer_string(ticker, from_date, to_date)
-    answer_list = dops.get_answer_list_from_string(answer_string)
-    pandas_dataframe = dops.historical_pd_dataframe(answer_list)
+    answer_string = dataops.get_historical_answer_string(ticker, from_date, to_date)
+    answer_list = dataops.get_answer_list_from_string(answer_string)
+    pandas_dataframe = dataops.historical_pd_dataframe(answer_list)
 
     # TODO Finish this
     return pandas_dataframe
@@ -80,7 +80,7 @@ def correlation_matrix(tickers):
 
     try:
         if type(tickers) == str:
-            ticker_list = sorted(dops.get_ticker_list_from_file(tickers))
+            ticker_list = sorted(dataops.get_ticker_list_from_file(tickers))
 
         elif type(tickers) == list:
             ticker_list = tickers
