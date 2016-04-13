@@ -1,9 +1,12 @@
-import os
 import csv
-import requests
-import pandas as pd
+import os
+
 import numpy as np
-from _decorators import *
+import pandas as pd
+import requests
+
+from ._decorators import *
+from ._exceptions import *
 
 
 def read_api_dict():
@@ -97,13 +100,6 @@ def get_date_components(date_object):
         return m, d, y
 
 
-class NoHistoricalDataError(Exception):
-    def __init__(self, message):
-        self.message = message
-
-# TODO move to separate exceptions file
-
-
 @timeit
 def get_historical_answer_string(ticker, from_date=None, to_date=None):
 
@@ -119,10 +115,10 @@ def get_historical_answer_string(ticker, from_date=None, to_date=None):
         try:
             response = requests.get(base_url, params)
             if response.status_code == 404:
-                raise NoHistoricalDataError('No historical data for ticker ' + params['s'])
+                raise Yahoo404Error('No historical data for ticker ' + params['s'])
         except requests.exceptions.ConnectionError:
             print 'Connection error, trying again...'
-        except NoHistoricalDataError:
+        except Yahoo404Error:
             return None
         else:
             answer_string = response.text

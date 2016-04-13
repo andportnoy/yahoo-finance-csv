@@ -1,5 +1,6 @@
 import _data_operations as dops
-from _decorators import *
+from ._decorators import *
+from ._exceptions import *
 
 
 @timeit
@@ -31,9 +32,9 @@ def current(tickers, write_to_csv=False, result_csv_path=None):
             ticker_list = tickers
             ticker_string = dops.get_ticker_string_from_list(ticker_list)
         else:
-            raise Exception('Please provide either a csv file or a list of tickers.')
-    except Exception:
-        quit(Exception.message)
+            raise BadTickersFormat('Please provide either a csv file or a list of tickers.')
+    except BadTickersFormat as err:
+        quit(err.message)
     else:
         # make request and create a pandas dataframe from the response
         answer_string = dops.get_current_answer_string(ticker_string, param_string)
@@ -84,9 +85,9 @@ def correlation_matrix(tickers):
         elif type(tickers) == list:
             ticker_list = tickers
         else:
-            raise Exception('Please provide either a csv file or a list of tickers.')
-    except Exception:
-        quit(Exception.message)
+            raise BadTickersFormat('Please provide either a csv file or a list of tickers.')
+    except BadTickersFormat as err:
+        quit(err.message)
     else:
 
         # iterate through tuples of tickers and corresponding dataframes
