@@ -19,6 +19,9 @@ df2 = yfc.historical('COP')
 # takes a list of tickers or a path to a csv file with a 'ticker' header
 corrmat = yfc.correlation_matrix('tickers.csv')
 ```
+
+You can visualize the correlation matrix using [seaborn](https://stanford.edu/~mwaskom/software/seaborn/examples/network_correlations.html).
+
 # Development goals
 Provide two main functions:  
 1. `current`, delivering realtime stock data as fast as possible  
