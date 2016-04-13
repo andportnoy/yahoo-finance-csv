@@ -1,6 +1,24 @@
 # Yahoo Finance to CSV
 A tiny Yahoo Finance API that lets you retrieve realtime and historical ~~(not yet)~~ stock data
 
+# Installation:
+```sh
+git clone https://github.com/andportnoy/yahoo-finance-csv
+```
+
+# Usage:
+``` python
+import yfc  
+
+# takes a list of tickers or a path to a csv file with a 'ticker' header
+df1 = yfc.current(['AAPL', 'YHOO', 'GOOG'])
+
+# takes one ticker
+df2 = yfc.historical('COP')
+
+# takes a list of tickers or a path to a csv file with a 'ticker' header
+corrmat = yfc.correlation_matrix('tickers.csv')
+```
 # Development goals
 Provide two main functions:  
 1. `current`, delivering realtime stock data as fast as possible  
