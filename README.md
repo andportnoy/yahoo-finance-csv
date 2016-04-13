@@ -39,7 +39,7 @@ Provide two main functions:
 
 # Museum
 
-Insane one-liner (not used in the actual code) that cleans the data and computer a correlation matrix for a list of tickers with lambda functions, zip, map, filter, reduce, and listcomps inside:  
+Insane one-liner (not used in the actual code) that cleans the data and computes a correlation matrix for a list of tickers with lambda functions, zip, map, filter, reduce, and listcomps inside:  
 ```python
 reduce(lambda df1, df2: df1.join(df2, how='inner'), [df[['Close']].rename(columns={'Close': ticker}) for ticker, df in filter(lambda (ticker, df): df is not None, zip(ticker_list, map(historical, ticker_list)))]).corr()
 ```
@@ -47,6 +47,6 @@ reduce(lambda df1, df2: df1.join(df2, how='inner'), [df[['Close']].rename(column
 1. Retrieve historical data for each ticker in `ticker_list` using `map()`.
 2. Create a list of 2-tuples with ticker and corresponding dataframe inside using `zip()`.
 3. Filter the list, preserving only the tuples where the dataframe `is not None` using `filter()` and a `lambda` expression.
-4. For each dataframe, drop all the columns except 'Close', put them in a list, using a list comprehension.
+4. For each dataframe, drop all the columns except 'Close', put them in a list using a list comprehension.
 5. Rename the 'Close' column of each dataframe with the corresponding ticker using a dataframe method.
 6. Inner-join the first two dataframes, then inner-join the result with the third dataframe, and so on, inner-joing all the dataframes using `reduce()` and a `lambda` expression
