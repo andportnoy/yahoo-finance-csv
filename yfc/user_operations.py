@@ -1,3 +1,5 @@
+import seaborn as sns
+
 import _data_operations as dataops
 from ._decorators import timeit
 from ._exceptions import BadTickersFormat
@@ -75,7 +77,7 @@ def historical(ticker, from_date=None, to_date=None):
 
 
 @timeit
-def correlation_matrix(tickers):
+def correlation_matrix(tickers, heatmap=False):
     """Calculates a correlation matrix for the stocks in ticker_list."""
 
     try:
@@ -94,7 +96,7 @@ def correlation_matrix(tickers):
         full_dfs = zip(ticker_list, map(historical, ticker_list))
 
         # throw out the Nones
-        not_nones = [(ticker, df) for ticker, df in full_dfs if df is not None]
+        not_nones = filter(lambda (ticker, df): df is not None, full_dfs)
 
         # use only the 'Close' column
         close_only = [(ticker, df[['Close']]) for ticker, df in not_nones]
@@ -105,4 +107,13 @@ def correlation_matrix(tickers):
         # inner-join all the dataframes by index ('Date')
         joined = reduce(lambda df1, df2: df1.join(df2, how='inner'), renamed)
 
-        return joined.corr()
+        corrmat = joined.corr()
+
+        if heatmap:
+
+            # Draw the heatmap using seaborn
+            sns.heatmap(corrmat, vmax=.8, square=True)
+
+            sns.plt.show()
+
+        return corrmat
