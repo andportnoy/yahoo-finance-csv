@@ -180,14 +180,13 @@ def construct_row(k, header_list, answer_list):
     return {header_list[i]: answer_list[k][i] for i in xrange(len(header_list))}
 
 
-def current_pd_dataframe(api_dict, answer_list, param_list, ticker_list):
+def current_pd_dataframe(api_dict, answer_list, param_list):
     """Constructs a pandas DataFrame from a data dictionary and cleans it.
 
     Arguments:
         api_dict --> dictionary containing Yahoo Finance API parameters and their definitions
         answer_list --> list of lists containing rows for future DataFrame
         param_list --> list of Yahoo Finance API parameters that were used to request data
-        ticker_list --> list of tickers for which data was requested
 
     Returns:
         pandas_dataframe --> configuration: rows are companies, columns are parameter definitions
@@ -200,7 +199,7 @@ def current_pd_dataframe(api_dict, answer_list, param_list, ticker_list):
     dict_for_pandas = {api_dict[param_list[index]]: item for index, item in enumerate(zip(*answer_list))}
 
     pandas_dataframe = pd.DataFrame(dict_for_pandas)
-    pandas_dataframe.index = ticker_list
+    pandas_dataframe.set_index('symbol')
     pandas_dataframe = pandas_dataframe.replace(to_replace='N/A', value=np.nan)
 
     for item in pandas_dataframe:

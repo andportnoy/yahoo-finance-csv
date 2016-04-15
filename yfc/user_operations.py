@@ -1,6 +1,4 @@
 # testing auto deploy, is it working, ot is it not?
-import seaborn as sns
-
 import _data_operations as dataops
 from ._decorators import timeit
 from ._exceptions import BadTickersFormat
@@ -111,7 +109,7 @@ def correlation_matrix(tickers, heatmap=False):
         corrmat = joined.corr()
 
         if heatmap:
-
+            import seaborn as sns
             # Draw the heatmap using seaborn
             sns.heatmap(corrmat, vmax=.8, square=True)
 
