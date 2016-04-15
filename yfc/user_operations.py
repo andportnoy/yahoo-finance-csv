@@ -40,7 +40,7 @@ def current(tickers, write_to_csv=False, result_csv_path=None):
         # make request and create a pandas dataframe from the response
         answer_string = dataops.get_current_answer_string(ticker_string, param_string)
         answer_list = dataops.get_answer_list_from_string(answer_string)
-        pandas_dataframe = dataops.current_pd_dataframe(api_dict, answer_list, param_list, ticker_list)
+        pandas_dataframe = dataops.current_pd_dataframe(api_dict, answer_list, param_list)
 
         if write_to_csv:
             pandas_dataframe.to_csv(result_csv_path)
