@@ -199,6 +199,7 @@ def current_pd_dataframe(api_dict, answer_list, param_list):
     dict_for_pandas = {api_dict[param_list[index]]: item for index, item in enumerate(zip(*answer_list))}
 
     pandas_dataframe = pd.DataFrame(dict_for_pandas)
+    pandas_dataframe = pandas_dataframe.set_index('symbol')
     pandas_dataframe = pandas_dataframe.replace(to_replace='N/A', value=np.nan)
 
     for item in pandas_dataframe:
@@ -214,7 +215,7 @@ def current_pd_dataframe(api_dict, answer_list, param_list):
     # TODO Convert columns to datetimes if possible
     # TODO Parse values with M, B for million/billion
 
-    pandas_dataframe.set_index('symbol')
+
     return pandas_dataframe
 
 
