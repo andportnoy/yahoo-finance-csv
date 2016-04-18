@@ -1,9 +1,9 @@
 import _data_operations as dataops
-from ._decorators import timeit
+from ._decorators import timed
 from ._exceptions import BadTickersFormat
 
 
-@timeit
+@timed
 def current(tickers, write_to_csv=False, result_csv_path=None):
     """Retrieves realtime stock data from Yahoo Finance.
 
@@ -47,7 +47,7 @@ def current(tickers, write_to_csv=False, result_csv_path=None):
         return pandas_dataframe
 
 
-@timeit
+@timed
 def historical(ticker, from_date=None, to_date=None, write_to_csv=False, result_csv_path=None):
     """Retrieves historical stock price data from Yahoo Finance.
 
@@ -76,7 +76,7 @@ def historical(ticker, from_date=None, to_date=None, write_to_csv=False, result_
     return pandas_dataframe
 
 
-@timeit
+@timed
 def correlation_matrix(tickers, heatmap=False):
     """Calculates a correlation matrix for the stocks in ticker_list."""
 
@@ -92,11 +92,11 @@ def correlation_matrix(tickers, heatmap=False):
         quit(err.message)
     else:
 
-        # iterate through tuples of tickers and corresponding dataframes
-        full_dfs = zip(ticker_list, map(historical, ticker_list))
+        # get historical data for each ticker in ticker_list
+        full_dfs = [historical(ticker) for ticker in ticker_list]
 
         # throw out the Nones
-        not_nones = filter(lambda (ticker, df): df is not None, full_dfs)
+        not_nones = [(ticker, df) for ticker, df in zip(ticker_list, full_dfs) if df is not None]
 
         # use only the 'Close' column
         close_only = [(ticker, df[['Close']]) for ticker, df in not_nones]

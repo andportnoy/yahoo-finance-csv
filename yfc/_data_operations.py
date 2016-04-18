@@ -1,10 +1,11 @@
 import csv
 import os
+
+import requests
 import numpy as np
 import pandas as pd
-import requests
 
-from ._decorators import timeit
+from ._decorators import timed
 from ._exceptions import Yahoo404Error
 
 
@@ -59,7 +60,7 @@ def get_param_string_from_list(param_list):
     return ''.join(param_list)
 
 
-@timeit
+@timed
 def get_current_answer_string(ticker_string, param_string):
     """Queries Yahoo Finance API, returns a CSV string with the response.
 
@@ -99,7 +100,7 @@ def get_date_components(date_object):
         return m, d, y
 
 
-@timeit
+@timed
 def get_historical_answer_string(ticker, from_date=None, to_date=None):
 
     base_url = 'http://real-chart.finance.yahoo.com/table.csv'
@@ -181,7 +182,7 @@ def construct_row(k, header_list, answer_list):
 
 
 def current_pd_dataframe(api_dict, answer_list, param_list):
-    """Constructs a pandas DataFrame from a data dictionary and cleans it.
+    """Constructs a pandas DataFrame from a current stock data dictionary and cleans it.
 
     Arguments:
         api_dict --> dictionary containing Yahoo Finance API parameters and their definitions
@@ -212,14 +213,27 @@ def current_pd_dataframe(api_dict, answer_list, param_list):
         except ValueError:
             print colname, 'could not be converted.'
 
-    # TODO Convert columns to datetimes if possible
+    # TODO Convert columns with string dates to Pandas dates if possible
     # TODO Parse values with M, B for million/billion
 
     return pandas_dataframe
 
 
 def historical_pd_dataframe(answer_list):
+    """Constructs a pandas DataFrame from a historical stock price data dictionary and cleans it.
 
+        Arguments:
+            answer_list --> list of lists containing rows for future DataFrame
+
+        Returns:
+            pandas_dataframe --> configuration: rows are companies, columns are parameter definitions
+                                 wrangling:
+                                            - 'N/A's are replaced with NumPy NaNs
+                                            - all-NaN columns are dropped
+                                            - where possible, columns are converted to numeric
+    """
+
+    # happens when Yahoo returns a 404 error for a ticker
     if answer_list is None:
         return None
 
