@@ -48,7 +48,7 @@ def current(tickers, write_to_csv=False, result_csv_path=None):
 
 
 @timeit
-def historical(ticker, from_date=None, to_date=None):
+def historical(ticker, from_date=None, to_date=None, write_to_csv=False, result_csv_path=None):
     """Retrieves historical stock price data from Yahoo Finance.
 
     Arguments:
@@ -70,7 +70,9 @@ def historical(ticker, from_date=None, to_date=None):
     answer_list = dataops.get_answer_list_from_string(answer_string)
     pandas_dataframe = dataops.historical_pd_dataframe(answer_list)
 
-    # TODO Finish this
+    if write_to_csv:
+        pandas_dataframe.to_csv(result_csv_path)
+
     return pandas_dataframe
 
 
