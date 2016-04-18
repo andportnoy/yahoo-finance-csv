@@ -1,4 +1,3 @@
-# testing auto deploy, is it working, ot is it not?
 import _data_operations as dataops
 from ._decorators import timeit
 from ._exceptions import BadTickersFormat

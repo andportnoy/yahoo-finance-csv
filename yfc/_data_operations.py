@@ -215,7 +215,6 @@ def current_pd_dataframe(api_dict, answer_list, param_list):
     # TODO Convert columns to datetimes if possible
     # TODO Parse values with M, B for million/billion
 
-
     return pandas_dataframe
 
 
