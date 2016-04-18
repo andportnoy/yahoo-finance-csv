@@ -76,6 +76,32 @@ def historical(ticker, from_date=None, to_date=None, write_to_csv=False, result_
     return pandas_dataframe
 
 
+def mult_historical(tickers):
+    """Returns a Pandas dataframe with historical data for multiple tickers side by side.
+
+    Note: the set dates for which prices are available in the dataframe is the intersection of sets of dates
+    available for each stock. In future, an option to return all data will be available.
+    """
+    # TODO finish the docstring and add option for outer joining on dates
+
+    # get historical data for each ticker in ticker_list
+    full_dfs = [historical(ticker) for ticker in tickers]
+
+    # throw out the Nones
+    not_nones = [(ticker, df) for ticker, df in zip(tickers, full_dfs) if df is not None]
+
+    # use only the 'Close' column
+    close_only = [(ticker, df[['Close']]) for ticker, df in not_nones]
+
+    # replace 'Close' in all dataframes with their tickers
+    renamed = [df.rename(columns={'Close': ticker}) for ticker, df in close_only]
+
+    # inner-join all the dataframes by index ('Date')
+    joined = reduce(lambda df1, df2: df1.join(df2, how='inner'), renamed)
+
+    return joined
+
+
 @timed
 def correlation_matrix(tickers, heatmap=False):
     """Calculates a correlation matrix for the stocks in ticker_list."""
@@ -92,22 +118,9 @@ def correlation_matrix(tickers, heatmap=False):
         quit(err.message)
     else:
 
-        # get historical data for each ticker in ticker_list
-        full_dfs = [historical(ticker) for ticker in ticker_list]
+        data = mult_historical(ticker_list)
 
-        # throw out the Nones
-        not_nones = [(ticker, df) for ticker, df in zip(ticker_list, full_dfs) if df is not None]
-
-        # use only the 'Close' column
-        close_only = [(ticker, df[['Close']]) for ticker, df in not_nones]
-
-        # replace 'Close' in all dataframes with their tickers
-        renamed = [df.rename(columns={'Close': ticker}) for ticker, df in close_only]
-
-        # inner-join all the dataframes by index ('Date')
-        joined = reduce(lambda df1, df2: df1.join(df2, how='inner'), renamed)
-
-        corrmat = joined.corr()
+        corrmat = data.corr()
 
         if heatmap:
             import seaborn as sns
