@@ -12,6 +12,7 @@ __pycache__/
 # Output and input
 data.csv
 tickers.csv
+sp500tickers.csv
 
 # C extensions
 *.so

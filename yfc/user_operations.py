@@ -4,7 +4,7 @@ from ._exceptions import BadTickersFormat
 
 
 @timed
-def current(tickers, write_to_csv=False, result_csv_path=None):
+def current(tickers, write_to_csv=False, result_csv_path='data.csv'):
     """Retrieves realtime stock data from Yahoo Finance.
 
     Arguments:
@@ -84,22 +84,32 @@ def mult_historical(tickers):
     """
     # TODO finish the docstring and add option for outer joining on dates
 
-    # get historical data for each ticker in ticker_list
-    full_dfs = [historical(ticker) for ticker in tickers]
+    try:
+        if type(tickers) == str:
+            ticker_list = sorted(dataops.get_ticker_list_from_file(tickers))
+        elif type(tickers) == list:
+            ticker_list = tickers
+        else:
+            raise BadTickersFormat('Please provide either a csv file or a list of tickers.')
+    except BadTickersFormat as err:
+        quit(err.message)
+    else:
+        # get historical data for each ticker in ticker_list
+        full_dfs = [historical(ticker) for ticker in ticker_list]
 
-    # throw out the Nones
-    not_nones = [(ticker, df) for ticker, df in zip(tickers, full_dfs) if df is not None]
+        # throw out the Nones
+        not_nones = [(ticker, df) for ticker, df in zip(ticker_list, full_dfs) if df is not None]
 
-    # use only the 'Close' column
-    close_only = [(ticker, df[['Close']]) for ticker, df in not_nones]
+        # use only the 'Close' column
+        close_only = [(ticker, df[['Close']]) for ticker, df in not_nones]
 
-    # replace 'Close' in all dataframes with their tickers
-    renamed = [df.rename(columns={'Close': ticker}) for ticker, df in close_only]
+        # replace 'Close' in all dataframes with their tickers
+        renamed = [df.rename(columns={'Close': ticker}) for ticker, df in close_only]
 
-    # inner-join all the dataframes by index ('Date')
-    joined = reduce(lambda df1, df2: df1.join(df2, how='inner'), renamed)
+        # inner-join all the dataframes by index ('Date')
+        joined = reduce(lambda df1, df2: df1.join(df2, how='inner'), renamed)
 
-    return joined
+        return joined
 
 
 @timed
