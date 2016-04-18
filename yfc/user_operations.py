@@ -76,7 +76,7 @@ def historical(ticker, from_date=None, to_date=None, write_to_csv=False, result_
     return pandas_dataframe
 
 
-def mult_historical(tickers):
+def mult_historical(tickers, write_to_csv=False, result_csv_path=None):
     """Returns a Pandas dataframe with historical data for multiple tickers side by side.
 
     Note: the set dates for which prices are available in the dataframe is the intersection of sets of dates
@@ -111,6 +111,9 @@ def mult_historical(tickers):
 
         # TODO return a dataframe including all columns from historical data incorporated under a multiindex
 
+        if write_to_csv:
+            joined.to_csv(result_csv_path)
+            
         return joined
 
 
