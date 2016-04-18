@@ -76,7 +76,7 @@ def historical(ticker, from_date=None, to_date=None, write_to_csv=False, result_
     return pandas_dataframe
 
 
-def mult_historical(tickers, write_to_csv=False, result_csv_path=None):
+def mult_historical(tickers, write_to_csv=False, result_csv_path=None, how='inner'):
     """Returns a Pandas dataframe with historical data for multiple tickers side by side.
 
     Note: the set dates for which prices are available in the dataframe is the intersection of sets of dates
@@ -107,13 +107,13 @@ def mult_historical(tickers, write_to_csv=False, result_csv_path=None):
         renamed = [df.rename(columns={'Adj Close': ticker}) for ticker, df in close_only]
 
         # inner-join all the dataframes by index ('Date')
-        joined = reduce(lambda df1, df2: df1.join(df2, how='inner'), renamed)
+        joined = reduce(lambda df1, df2: df1.join(df2, how=how), renamed)
 
         # TODO return a dataframe including all columns from historical data incorporated under a multiindex
 
         if write_to_csv:
             joined.to_csv(result_csv_path)
-            
+
         return joined
 
 
