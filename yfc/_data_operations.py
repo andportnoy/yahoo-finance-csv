@@ -125,18 +125,6 @@ def get_historical_answer_string(ticker, from_date=None, to_date=None):
             return answer_string
 
 
-def get_header_list(param_list, api_dict):
-    """Creates a header for a CSV data file.
-
-    Arguments:
-        param_list --> list of Yahoo Finance API parameters formed by comma-splitting param_string
-        api_dict --> dictionary with Yahoo Finance API parameter descriptions mapped to parameters
-    Returns:
-        list of parameter descriptions retrieved from the API dictionary.
-    """
-    return [api_dict[param] for param in param_list]
-
-
 def get_answer_list_from_string(answer_string):
     """Creates a list from the response string.
 
@@ -152,33 +140,6 @@ def get_answer_list_from_string(answer_string):
     reader = csv.reader(csv_rows_list)
     answer_list = list(reader)
     return answer_list
-
-
-def save_raw_answer_to_file(answer_path, answer_string):
-    """Saves the response string to a specified path.
-
-    Arguments:
-        answer_path --> path to target
-        answer_string --> text content of Yahoo Finance API request response
-    Returns:
-        nothing
-    """
-    with open(answer_path, 'wb') as raw_data:
-        raw_data.write(answer_string)
-    print 'Raw response csv file saved to ' + answer_path
-
-
-def construct_row(k, header_list, answer_list):
-    """Creates a row of data for a CSV file (to be used with csv.DictWriter).
-
-    Arguments:
-        k --> position of observation sublist on the response list
-        header_list --> list of parameter names except 'ticker'
-        answer_list --> list formed by comma-splitting answer_string
-    Returns:
-        row of data in form of a dictionary
-    """
-    return {header_list[i]: answer_list[k][i] for i in xrange(len(header_list))}
 
 
 def current_pd_dataframe(api_dict, answer_list, param_list):
@@ -253,25 +214,3 @@ def historical_pd_dataframe(answer_list):
             print colname, 'could not be converted.'
 
     return pandas_dataframe
-
-
-def save_formatted_csv(result_csv_path, header_list, ticker_list, answer_list):
-    """DEPRECATED: use write_to_csv option instead.
-    Writes the data from the response list to a CSV file using csv.DictWriter.
-
-    Arguments:
-        result_csv_path -- > path to target csv file (existing file will be overwritten)
-        header_list --> list of parameter descriptions
-        ticker_list --> list of tickers for which data is to be retrieved
-        answer_list --> list formed by comma-splitting answer_string
-    Returns:
-        nothing
-    """
-    with open(result_csv_path, 'wb') as data:
-        fieldnames = ['ticker'] + header_list
-        writer = csv.DictWriter(data, fieldnames, quoting=csv.QUOTE_NONE, escapechar='\b')
-        writer.writeheader()
-        for k in range(len(ticker_list)):
-            row = construct_row(k, header_list, answer_list)
-            row['ticker'] = ticker_list[k]
-            writer.writerow(row)

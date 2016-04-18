@@ -101,13 +101,15 @@ def mult_historical(tickers):
         not_nones = [(ticker, df) for ticker, df in zip(ticker_list, full_dfs) if df is not None]
 
         # use only the 'Close' column
-        close_only = [(ticker, df[['Close']]) for ticker, df in not_nones]
+        close_only = [(ticker, df[['Adj Close']]) for ticker, df in not_nones]
 
         # replace 'Close' in all dataframes with their tickers
-        renamed = [df.rename(columns={'Close': ticker}) for ticker, df in close_only]
+        renamed = [df.rename(columns={'Adj Close': ticker}) for ticker, df in close_only]
 
         # inner-join all the dataframes by index ('Date')
         joined = reduce(lambda df1, df2: df1.join(df2, how='inner'), renamed)
+
+        # TODO return a dataframe including all columns from historical data incorporated under a multiindex
 
         return joined
 
