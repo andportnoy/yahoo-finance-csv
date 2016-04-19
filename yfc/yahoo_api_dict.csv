@@ -56,7 +56,7 @@ k4,change_from_52_week_high
 j6,percent_change_from_52_week_low
 k5,percent_change_from_52_week_high
 w,52_week_range
-v,more_info
+i,more_info
 j1,market_capitalization
 j3,market_cap_realtime
 f6,float_shares
