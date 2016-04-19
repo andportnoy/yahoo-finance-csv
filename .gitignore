@@ -13,6 +13,7 @@ __pycache__/
 data.csv
 tickers.csv
 sp500tickers.csv
+sp500.csv
 
 # C extensions
 *.so
