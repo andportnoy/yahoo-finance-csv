@@ -109,12 +109,14 @@ def mult_historical(tickers, write_to_csv=False, result_csv_path=None, how='inne
         # inner-join all the dataframes by index ('Date')
         joined = reduce(lambda df1, df2: df1.join(df2, how=how), renamed)
 
+        joined.columns = [name.upper() for name in list(joined.columns)]
         # TODO return a dataframe including all columns from historical data incorporated under a multiindex
 
+        result = joined
         if write_to_csv:
-            joined.to_csv(result_csv_path)
+            result.to_csv(result_csv_path)
 
-        return joined
+        return result
 
 
 @timed

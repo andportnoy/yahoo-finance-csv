@@ -12,6 +12,7 @@ data.csv
 tickers.csv
 sp500tickers.csv
 sp500.csv
+sp500length.csv
 
 #Ipython Notebook
 *.ipynb
