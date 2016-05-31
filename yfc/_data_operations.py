@@ -2,7 +2,6 @@ import csv
 import os
 
 import requests
-import numpy as np
 import pandas as pd
 
 from ._exceptions import Yahoo404Error, BadTickersFormatError
@@ -158,7 +157,7 @@ def current_pd_dataframe(api_dict, answer_list, param_list):
 
     pandas_dataframe = pd.DataFrame(dict_for_pandas)
     pandas_dataframe = pandas_dataframe.set_index('symbol')
-    pandas_dataframe = pandas_dataframe.replace(to_replace='N/A', value=np.nan)
+    pandas_dataframe = pandas_dataframe.replace(to_replace='N/A', value=None)
 
     for item in pandas_dataframe:
         if pandas_dataframe[item].count() == 0:
