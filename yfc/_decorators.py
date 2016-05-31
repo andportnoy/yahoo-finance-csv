@@ -8,6 +8,6 @@ def timed(func):
         result = func(*args, **kwargs)
         finish = datetime.now()
         diff = finish - start
-        print '\n{0} call took {1} seconds.\n'.format(func.__name__, diff.total_seconds())
+        print('\n{0} call took {1} seconds.\n'.format(func.__name__, diff.total_seconds()))
         return result
     return timed_func

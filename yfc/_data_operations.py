@@ -5,8 +5,7 @@ import requests
 import numpy as np
 import pandas as pd
 
-from ._decorators import timed
-from ._exceptions import Yahoo404Error
+from ._exceptions import Yahoo404Error, BadTickersFormatError
 
 
 def read_api_dict():
@@ -46,8 +45,11 @@ def get_ticker_list_from_file(tickers_csv_path):
 def get_ticker_string_from_list(ticker_list):
     """Returns a string of tickers separated by commas joined from a list."""
 
-    ticker_string = ','.join(ticker_list)
-    return ticker_string
+    if isinstance(ticker_list, list):
+        ticker_string = ','.join(ticker_list)
+        return ticker_string
+    else:
+        raise BadTickersFormatError('argument must be a list.')
 
 
 def get_param_list_from_api_dict(api_dict):
@@ -60,7 +62,6 @@ def get_param_string_from_list(param_list):
     return ''.join(param_list)
 
 
-@timed
 def get_current_answer_string(ticker_string, param_string):
     """Queries Yahoo Finance API, returns a CSV string with the response.
 
@@ -77,30 +78,26 @@ def get_current_answer_string(ticker_string, param_string):
         try:
             response = requests.get(base_url, params)
         except requests.exceptions.ConnectionError:
-            print 'Connection error, trying again...'
+            print('Connection error, trying again...')
         else:
             answer_string = response.text
             return answer_string
 
 
-def get_date_components(date_object):
+def get_date_components(date_string):
     """Extracts components dates for a historical data request.
 
-    Arguments:
-        date_object --> string date, Python datetime, NumPy datetime64 or pandas Timestamp
-    Returns:
-        (m, d, y) --> month, day, year (integers)
+    :param date_string: string date, Python datetime, NumPy datetime64 or pandas Timestamp
+
+    :return: month, day, year (integers)
     """
-    # TODO implement datetime, datetime64 and Timestamp handling
-    if type(date_object) == str:
-        date_string = date_object
-        y, m, d = [int(i) for i in date_string.split('-')]
-        m -= 1  # Need to decrement, Yahoo has 0-indexing for months
 
-        return m, d, y
+    y, m, d = [int(i) for i in date_string.split('-')]
+    m -= 1  # Need to decrement, Yahoo has 0-indexing for months
+
+    return m, d, y
 
 
-@timed
 def get_historical_answer_string(ticker, from_date=None, to_date=None):
 
     base_url = 'http://real-chart.finance.yahoo.com/table.csv'
@@ -117,7 +114,7 @@ def get_historical_answer_string(ticker, from_date=None, to_date=None):
             if response.status_code == 404:
                 raise Yahoo404Error('No historical data for ticker ' + params['s'])
         except requests.exceptions.ConnectionError:
-            print 'Connection error, trying again...'
+            print('Connection error, trying again...')
         except Yahoo404Error:
             return None
         else:
@@ -128,10 +125,9 @@ def get_historical_answer_string(ticker, from_date=None, to_date=None):
 def get_answer_list_from_string(answer_string):
     """Creates a list from the response string.
 
-    Arguments:
-        answer_string --> text content of Yahoo Finance API request response
-    Returns:
-        list generated from the string by comma-splitting
+    :param answer_string: --> text content of Yahoo Finance API request response
+
+    :return: list generated from the string by comma-splitting
     """
 
     if answer_string is None:
@@ -145,17 +141,17 @@ def get_answer_list_from_string(answer_string):
 def current_pd_dataframe(api_dict, answer_list, param_list):
     """Constructs a pandas DataFrame from a current stock data dictionary and cleans it.
 
-    Arguments:
-        api_dict --> dictionary containing Yahoo Finance API parameters and their definitions
-        answer_list --> list of lists containing rows for future DataFrame
-        param_list --> list of Yahoo Finance API parameters that were used to request data
 
-    Returns:
-        pandas_dataframe --> configuration: rows are companies, columns are parameter definitions
-                             wrangling:
-                                        - 'N/A's are replaced with NumPy NaNs
-                                        - all-NaN columns are dropped
-                                        - where possible, columns are converted to numeric
+    :param api_dict: dictionary containing Yahoo Finance API parameters and their definitions
+    :param answer_list: list of lists containing rows for future DataFrame
+    :param param_list: list of Yahoo Finance API parameters that were used to request data
+
+    :return: a Pandas DataFrame of the following configuration:
+        rows are companies, columns are parameter definitions
+        wrangling:
+            - 'N/A's are replaced with NumPy NaNs
+            - all-NaN columns are dropped
+            - where possible, columns are converted to numeric
     """
     
     dict_for_pandas = {api_dict[param_list[index]]: item for index, item in enumerate(zip(*answer_list))}
@@ -172,7 +168,7 @@ def current_pd_dataframe(api_dict, answer_list, param_list):
         try:
             pandas_dataframe[colname] = pd.to_numeric(pandas_dataframe[colname])
         except ValueError:
-            print colname, 'could not be converted.'
+            print(colname, 'could not be converted.')
 
     # TODO Convert columns with string dates to Pandas dates if possible
     # TODO Parse values with M, B for million/billion
@@ -183,15 +179,14 @@ def current_pd_dataframe(api_dict, answer_list, param_list):
 def historical_pd_dataframe(answer_list):
     """Constructs a pandas DataFrame from a historical stock price data dictionary and cleans it.
 
-        Arguments:
-            answer_list --> list of lists containing rows for future DataFrame
+     :param answer_list: list of lists containing rows for future DataFrame
 
-        Returns:
-            pandas_dataframe --> configuration: rows are companies, columns are parameter definitions
-                                 wrangling:
-                                            - 'N/A's are replaced with NumPy NaNs
-                                            - all-NaN columns are dropped
-                                            - where possible, columns are converted to numeric
+     :return: a Pandas DataFrame of the following configuration:
+        rows are companies, columns are parameter definitions
+        wrangling:
+            - 'N/A's are replaced with NumPy NaNs
+            - all-NaN columns are dropped
+            - where possible, columns are converted to numeric
     """
 
     # happens when Yahoo returns a 404 error for a ticker
@@ -211,6 +206,6 @@ def historical_pd_dataframe(answer_list):
         try:
             pandas_dataframe[colname] = pd.to_numeric(pandas_dataframe[colname])
         except ValueError:
-            print colname, 'could not be converted.'
+            print(colname, 'could not be converted.')
 
     return pandas_dataframe

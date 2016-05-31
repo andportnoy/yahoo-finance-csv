@@ -1,20 +1,18 @@
-import _data_operations as dataops
-from ._decorators import timed
-from ._exceptions import BadTickersFormat
+from . import _data_operations as dataops
+from ._exceptions import BadTickersFormatError
 
 
-@timed
 def current(tickers, write_to_csv=False, result_csv_path='data.csv'):
+
     """Retrieves realtime stock data from Yahoo Finance.
 
-    Arguments:
-        tickers --> list of tickers or path to ticker csv file
-        write_to_csv --> boolean, current writes data to a csv file if set to True, returns a pandas dataframe
-                         if set to False (default)
-        result_csv_path --> string, specifies path to csv file to write the data (overwrites the file)
 
-    Returns:
-        a pandas dataframe or None (if write_to_csv is set to False)
+    :param tickers: list of tickers or path to ticker csv file
+    :param write_to_csv: boolean, current writes data to a csv file if set to True, returns a pandas dataframe
+                         if set to False (default)
+    :param result_csv_path: string, specifies path to csv file to write the data (overwrites the file)
+
+    :returns: a pandas dataframe or None (if write_to_csv is set to False)
     """
 
     # create parameter string for the request
@@ -32,8 +30,8 @@ def current(tickers, write_to_csv=False, result_csv_path='data.csv'):
             ticker_list = tickers
             ticker_string = dataops.get_ticker_string_from_list(ticker_list)
         else:
-            raise BadTickersFormat('Please provide either a csv file or a list of tickers.')
-    except BadTickersFormat as err:
+            raise BadTickersFormatError('Please provide either a csv file or a list of tickers.')
+    except BadTickersFormatError as err:
         quit(err.message)
     else:
         # make request and create a pandas dataframe from the response
@@ -47,23 +45,21 @@ def current(tickers, write_to_csv=False, result_csv_path='data.csv'):
         return pandas_dataframe
 
 
-@timed
 def historical(ticker, from_date=None, to_date=None, write_to_csv=False, result_csv_path=None):
     """Retrieves historical stock price data from Yahoo Finance.
 
-    Arguments:
-        ticker --> one ticker symbol
-        from_date --> lower bound for timeframe
-        to_date --> upper bound for timeframe
+    :param ticker: one ticker symbol
+    :param from_date: lower bound for timeframe
+    :param to_date: upper bound for timeframe
 
-        from_date and to_date can be of the following types:
-            - string of form 'YYYY-MM-DD'
-            - Python datetime
-            - NumPy datetime64
-            - Pandas Timestamp
+    from_date and to_date can be of the following types:
+        - string of form 'YYYY-MM-DD'
+        - Python datetime
+        - NumPy datetime64
+        - Pandas Timestamp
 
-    Returns:
-        Pandas DataFrame
+
+    :returns: Pandas DataFrame
     """
 
     answer_string = dataops.get_historical_answer_string(ticker, from_date, to_date)
@@ -90,8 +86,8 @@ def mult_historical(tickers, write_to_csv=False, result_csv_path=None, how='inne
         elif type(tickers) == list:
             ticker_list = tickers
         else:
-            raise BadTickersFormat('Please provide either a csv file or a list of tickers.')
-    except BadTickersFormat as err:
+            raise BadTickersFormatError('Please provide either a csv file or a list of tickers.')
+    except BadTickersFormatError as err:
         quit(err.message)
     else:
         # get historical data for each ticker in ticker_list
@@ -107,6 +103,7 @@ def mult_historical(tickers, write_to_csv=False, result_csv_path=None, how='inne
         renamed = [df.rename(columns={'Adj Close': ticker}) for ticker, df in close_only]
 
         # inner-join all the dataframes by index ('Date')
+        # TODO rewrite without using reduce for Python 3
         joined = reduce(lambda df1, df2: df1.join(df2, how=how), renamed)
 
         joined.columns = [name.upper() for name in list(joined.columns)]
@@ -117,33 +114,3 @@ def mult_historical(tickers, write_to_csv=False, result_csv_path=None, how='inne
             result.to_csv(result_csv_path)
 
         return result
-
-
-@timed
-def correlation_matrix(tickers, heatmap=False):
-    """Calculates a correlation matrix for the stocks in ticker_list."""
-
-    try:
-        if type(tickers) == str:
-            ticker_list = sorted(dataops.get_ticker_list_from_file(tickers))
-
-        elif type(tickers) == list:
-            ticker_list = tickers
-        else:
-            raise BadTickersFormat('Please provide either a csv file or a list of tickers.')
-    except BadTickersFormat as err:
-        quit(err.message)
-    else:
-
-        data = mult_historical(ticker_list)
-
-        corrmat = data.corr()
-
-        if heatmap:
-            import seaborn as sns
-            # Draw the heatmap using seaborn
-            sns.heatmap(corrmat, vmax=.8, square=True)
-
-            sns.plt.show()
-
-        return corrmat

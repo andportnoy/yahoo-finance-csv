@@ -3,6 +3,6 @@ class Yahoo404Error(Exception):
         self.message = message
 
 
-class BadTickersFormat(Exception):
+class BadTickersFormatError(Exception):
     def __init__(self, message):
         self.message = message
