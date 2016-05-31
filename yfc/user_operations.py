@@ -8,11 +8,10 @@ def current(tickers, write_to_csv=False, result_csv_path='data.csv'):
 
 
     :param tickers: list of tickers or path to ticker csv file
-    :param write_to_csv: boolean, current writes data to a csv file if set to True, returns a pandas dataframe
-                         if set to False (default)
+    :param write_to_csv: boolean, `current` writes the DataFrame to a csv file if set to `True` (`False` is default)
     :param result_csv_path: string, specifies path to csv file to write the data (overwrites the file)
 
-    :returns: a pandas dataframe or None (if write_to_csv is set to False)
+    :returns: a pandas `DataFrame`
     """
 
     # create parameter string for the request
@@ -52,17 +51,13 @@ def historical(ticker, from_date=None, to_date=None, write_to_csv=False, result_
     :param from_date: lower bound for timeframe
     :param to_date: upper bound for timeframe
 
-    from_date and to_date can be of the following types:
-        - string of form 'YYYY-MM-DD'
-        - Python datetime
-        - NumPy datetime64
-        - Pandas Timestamp
+    `from_date` and `to_date` need to be formatted as 'YYYY-MM-DD'
 
-
-    :returns: Pandas DataFrame
+    :returns: a pandas ``DataFrame``
     """
 
     answer_string = dataops.get_historical_answer_string(ticker, from_date, to_date)
+    print('Got data for', ticker)
     answer_list = dataops.get_answer_list_from_string(answer_string)
     pandas_dataframe = dataops.historical_pd_dataframe(answer_list)
 
@@ -72,13 +67,16 @@ def historical(ticker, from_date=None, to_date=None, write_to_csv=False, result_
     return pandas_dataframe
 
 
-def mult_historical(tickers, write_to_csv=False, result_csv_path=None, how='inner'):
+def mult_historical(tickers, write_to_csv=False, result_csv_path=None, how='outer'):
     """Returns a Pandas dataframe with historical data for multiple tickers side by side.
 
-    Note: the set dates for which prices are available in the dataframe is the intersection of sets of dates
-    available for each stock. In future, an option to return all data will be available.
+    :param tickers: list of tickers or path to ticker csv file
+    :param write_to_csv: boolean, `mult_historical` writes the DataFrame to a csv file
+            if set to `True` (`False` is default)
+    :param result_csv_path: string, specifies path to csv file to write the data (overwrites existing file)
+    :param how: specifies how the join should be made (outer join by default)
+    :return: a pandas `DataFrame`
     """
-    # TODO finish the docstring and add option for outer joining on dates
 
     try:
         if type(tickers) == str:
@@ -90,6 +88,8 @@ def mult_historical(tickers, write_to_csv=False, result_csv_path=None, how='inne
     except BadTickersFormatError as err:
         quit(err.message)
     else:
+
+        # TODO move all the reshaping business to dataops
         # get historical data for each ticker in ticker_list
         full_dfs = [historical(ticker) for ticker in ticker_list]
 
@@ -97,19 +97,20 @@ def mult_historical(tickers, write_to_csv=False, result_csv_path=None, how='inne
         not_nones = [(ticker, df) for ticker, df in zip(ticker_list, full_dfs) if df is not None]
 
         # use only the 'Close' column
-        close_only = [(ticker, df[['Adj Close']]) for ticker, df in not_nones]
+        adj_close_only = [(ticker, df[['Adj Close']]) for ticker, df in not_nones]
 
-        # replace 'Close' in all dataframes with their tickers
-        renamed = [df.rename(columns={'Adj Close': ticker}) for ticker, df in close_only]
+        # replace 'Adj. Close' in all dataframes with their tickers
+        renamed = [df.rename(columns={'Adj Close': ticker}) for ticker, df in adj_close_only]
 
         # inner-join all the dataframes by index ('Date')
-        # TODO rewrite without using reduce for Python 3
-        joined = reduce(lambda df1, df2: df1.join(df2, how=how), renamed)
+        joined = renamed[0]
+        for df in renamed[1:]:
+            joined = joined.join(df, how=how)
 
         joined.columns = [name.upper() for name in list(joined.columns)]
         # TODO return a dataframe including all columns from historical data incorporated under a multiindex
 
-        result = joined
+        result = joined.sort_index()
         if write_to_csv:
             result.to_csv(result_csv_path)
 
